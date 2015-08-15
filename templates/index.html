@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
     <h1>I am index/</h1>
+    <div class="video-container" data-container id="video-container">
 
+    </div>
+    <div class="hud-trigger">&nbsp;</div>
+    <div class="hud">
+        <div class="hud-internal">
+            <p class="rank" data-rank></p>
+            <p class="title" data-title></p>
+            <p class="url" data-url></p>
+        </div>
+    </div>
+    <div class="hidden">
+        <a id="parser" href="#"></a>
+    </div>
 {% endblock content %}

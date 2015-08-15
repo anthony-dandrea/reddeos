@@ -21,7 +21,16 @@
     {% endblock content %}
     {% block scripts %}
         <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-        {% assets filters='jsmin', output='scripts/dist/script.min.js', 'scripts/src/*.js' %}
+        <!-- // <script src="//www.youtube.com/player_api"></script> -->
+
+        {# I probably don't need this #}
+        {% assets filters='jsmin', output='scripts/dist/vendor.min.js', 'scripts/vendor/*.js' %}
+            <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
+
+
+        {# filters='jsmin', #}
+        {% assets output='scripts/dist/script.min.js', 'scripts/src/*.js' %}
             <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
     {% endblock scripts %}
