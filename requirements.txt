@@ -1,0 +1,8 @@
+Flask
+Jinja2
+Flask-Assets
+webassets
+jsmin
+cssmin
+django-htmlmin
+praw
