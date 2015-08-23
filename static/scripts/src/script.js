@@ -88,8 +88,8 @@ $(function() {
     // Embed video
     function embedVideo(e) {
         console.log('called embedVideo with e:');
-				console.log(e);
-				console.log('next_video is: ' + e.next_video);
+        console.log(e);
+        console.log('next_video is: ' + e.next_video);
         if (e.next_video != undefined) {
           /* future proofing:
            * if user can specify the exact video they want from a list, an event
@@ -117,6 +117,7 @@ $(function() {
         vidTitle.text('Title: '+videos[count].title);
         vidUrl.html('URL: <a target="_blank" href="'+url+'">'+url+'</a>');
         if (youtubeCheck(url)) {
+            $.cookie('pww', count);
             var parser = document.createElement('a');
             parser.href = url;
             var id = parser.search.replace('?v=', '');
@@ -184,7 +185,8 @@ $(function() {
     $.when(getYtLib(), getVimeoLib(), getVideos())
     .done(function() {
         $('[data-loading]').addClass('hidden');
-        embedVideo({next_video: 0});
+        var cookieCount = parseInt($.cookie('pww'));
+        embedVideo({next_video: cookieCount ? cookieCount : 0});
     });
 
     // Hud toggle
