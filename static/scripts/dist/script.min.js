@@ -4,7 +4,30 @@ $(function() {
         count     = 1,
         vidRank   = $('[data-rank]'),
         vidTitle  = $('[data-title]'),
-        vidUrl  = $('[data-url]');
+        vidUrl    = $('[data-url]'),
+        ytPlayer;
+
+    function setEmailCookie(email) {
+        var now = new Date();
+        var time = now.getTime();
+        time += 1200 * 1000;
+        now.setTime(time);
+        document.cookie =
+        'whitepaperemail=' + email + '; expires=' +
+        now.toUTCString() + ';';
+    };
+
+    // Set cookie
+    function setCookie(key, value) {
+        document.cookie = key + '=' + value + ';';
+    }
+
+    // Get cookie value
+    var cookieValue = function(key) {
+        var regexKey = "^(?:.*;)?"+key+"=([^;]+)(?:.*)?$"
+        regexKey = new RegExp(regexKey);
+        return (document.cookie.match(regexKey)||[,null])[1];
+    }
 
     // Check if video url is YouTube
     function vimeoCheck(url) {
@@ -26,22 +49,24 @@ $(function() {
         }
     }
 
-    // Get youtube script on doc.ready and get videos
-    // TODO Promise me <3
-    $.getScript('https://www.youtube.com/iframe_api', getVideos);
-
     // Make youtube video
     function makeYTPlayer(id) {
-        var player;
-        player = new YT.Player('video-container', {
-            videoId: id,
-            playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0, 'showinfo': 0 },
-            events: {
-                'onReady': onYTPlayerReady,
-                'onStateChange': onYTPlayerStateChange,
-                'onError': onYTPlayerError
-            }
-        });
+        $('#youtube-video-container').show();
+        if (typeof ytPlayer == 'undefined') {
+            // make new player
+            ytPlayer = new YT.Player('youtube-video-container', {
+                videoId: id,
+                playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0, 'showinfo': 0 },
+                events: {
+                    'onReady': onYTPlayerReady,
+                    'onStateChange': onYTPlayerStateChange,
+                    'onError': onYTPlayerError
+                }
+            });
+        } else {
+            // update existing player
+            ytPlayer.loadVideoById(id);
+        }
     }
     // autoplay youtube video
     function onYTPlayerReady(event) {
@@ -50,21 +75,20 @@ $(function() {
     // when youtube video finishes
     function onYTPlayerStateChange(event) {
         if (event.data === 0) {
-            console.log('yt done');
             $(document).trigger('videoDone');
         }
     }
+    // when youtube errors out
     function onYTPlayerError(event) {
-        alert('Youtube error:', event.data);
+        $(document).trigger('videoDone');
     }
 
 
     // Embed video
     function embedVideo() {
-        console.log('embed start');
-        debugger;
         var url = videos[count].url;
-        $('[data-container]').html('');
+        // $('[data-container]').html('');
+        $('[data-container]').hide();
         vidRank.text('Rank: '+count);
         vidTitle.text('Title: '+videos[count].title);
         vidUrl.html('URL: <a target="_blank" href="'+url+'">'+url+'</a>');
@@ -77,6 +101,14 @@ $(function() {
         // vimeo
         // else if () {
         // }
+        else {
+            // couldn't match video
+            // try next video
+            console.log('Failed to match video');
+            count++
+            embedVideo();
+            return false;
+        }
         count++;
     }
 
@@ -84,16 +116,44 @@ $(function() {
     $(document).on('videoDone', embedVideo);
 
     // Get reddit videos list on load
-    // TODO: make this call a promise with youtube api call
     function getVideos() {
+        var d = $.Deferred();
         $.getJSON('/get-videos', function(data) {
-            console.log(data);
             videos = data;
-            embedVideo();
+            d.resolve();
         })
         .fail(function(error) {
-            alert('Server error.')
+            alert('Server error. Please refresh.');
         });
+        return d.promise();
     }
-    // getVideos();
+
+    // Get libraries
+    function getYtLib() {
+        var d = $.Deferred();
+        $.getScript('//www.youtube.com/iframe_api', function() {
+            d.resolve();
+        });
+        return d.promise();
+    }
+    function getVimeoLib() {
+        var d = $.Deferred();
+        $.getScript('//f.vimeocdn.com/js/froogaloop2.min.js', function() {
+            d.resolve();
+        });
+        return d.promise();
+    }
+
+    // Promise for multiple library and ajax calls
+    $.when(getYtLib(), getVimeoLib(), getVideos())
+    .done(function() {
+        $('[data-loading]').addClass('hidden');
+        embedVideo();
+    });
+
+    // Hud toggle
+    $('[data-hud-toggle]').on('click', function() {
+        $(this).parent().toggleClass('active');
+    });
+
 });
