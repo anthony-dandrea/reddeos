@@ -1,7 +1,8 @@
 $(function() {
     // Declare vars
     var videos    = {},
-        count     = 1,
+        count     = 0,
+        counter   = 1,
         vidRank   = $('[data-rank]'),
         vidTitle  = $('[data-title]'),
         vidUrl    = $('[data-url]'),
@@ -75,36 +76,44 @@ $(function() {
     // when youtube video finishes
     function onYTPlayerStateChange(event) {
         if (event.data === 0) {
-            $(document).trigger({
-              type: 'videoDone',
-              next: 1
-            });
+            $(document).trigger('videoDone');
         }
     }
     // when youtube errors out
     function onYTPlayerError(event) {
-        $(document).trigger({
-          type: 'videoDone',
-          next: 1
-        });
+        $(document).trigger('videoDone');
     }
 
 
     // Embed video
     function embedVideo(e) {
-        if (e.next_video) {
+        console.log('called embedVideo with e:');
+				console.log(e);
+				console.log('next_video is: ' + e.next_video);
+        if (e.next_video != undefined) {
           /* future proofing:
            * if user can specify the exact video they want from a list, an event
            * is created that sets the next_video event attribute explicitly
            */
           count = e.next_video;
         } else {
-          counter = e.next ? e.next : 1;
           count += counter;
         }
-        var url = videos[count].url;
+        console.log('counter is: ' + counter);
+        console.log('NEW count is: ' + count);
+        var url;
+        try {
+          url = videos[count].url;
+        } catch(e) {
+          if (count < 0) {
+            count = 0;
+          } else {
+            count--;
+          }
+          url = videos[count].url;
+        }
         $('[data-container]').hide();
-        vidRank.text('Rank: '+count);
+        vidRank.text('Rank: '+(count+1));
         vidTitle.text('Title: '+videos[count].title);
         vidUrl.html('URL: <a target="_blank" href="'+url+'">'+url+'</a>');
         if (youtubeCheck(url)) {
@@ -120,8 +129,11 @@ $(function() {
             // couldn't match video
             // try next video
             console.log('Failed to match video');
-            count += counter;
-            embedVideo(e);
+            if (e.next_video) {
+              embedVideo({});
+            } else {
+              embedVideo({});
+            }
             return false;
         }
     }
@@ -134,6 +146,16 @@ $(function() {
         var d = $.Deferred();
         $.getJSON('/get-videos', function(data) {
             videos = data;
+            console.log('about to call foreach');
+            videos.forEach(
+              function(video, i) {
+                console.log('calling for each for the ' + i + ' time');
+                var newEl = $('<p>' + (i) + '</p>');
+                newEl.data('video', i);
+                newEl.on('click', handleClickedVideo);
+                $('.previous').after(newEl);
+              }
+            )
             d.resolve();
         })
         .fail(function(error) {
@@ -162,7 +184,7 @@ $(function() {
     $.when(getYtLib(), getVimeoLib(), getVideos())
     .done(function() {
         $('[data-loading]').addClass('hidden');
-        embedVideo({});
+        embedVideo({next_video: 0});
     });
 
     // Hud toggle
@@ -173,17 +195,20 @@ $(function() {
 
     $('.next').on('click', handleClickedNext);
     function handleClickedNext() {
-        $(document).trigger({
-          type: 'videoDone',
-          next: 1 
-        });
+        counter = 1;
+        $(document).trigger('videoDone');
     }
 
     $('.previous').on('click', handleClickedPrevious);
     function handleClickedPrevious() {
+        counter = -1;
+        $(document).trigger('videoDone');
+    }
+
+    function handleClickedVideo() {
         $(document).trigger({
           type: 'videoDone',
-          next: -1 
+          next_video: $(this).data('video')
         });
     }
 

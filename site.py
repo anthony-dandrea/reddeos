@@ -1,4 +1,6 @@
-from flask import Flask, render_template, jsonify, request, make_response, session, redirect, abort
+import json
+
+from flask import Flask, render_template, request, make_response, session, redirect, abort
 from flask.ext.assets import Environment, Bundle
 from htmlmin.minify import html_minify
 from flask.ext.cache import Cache
@@ -31,7 +33,7 @@ def get_videos():
     Cache result for 30 mins
     """
     from reddit import get_videos
-    return jsonify(get_videos())
+    return json.dumps(get_videos())
 
 if __name__ == '__main__':
     Environment.auto_build = True

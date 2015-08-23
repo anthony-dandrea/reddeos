@@ -6,11 +6,11 @@ def get_videos():
     """
     r = praw.Reddit(user_agent='reddeos_reddit_video_viewer')
     submissions = r.get_subreddit('videos').get_hot(limit=400)
-    posts = dict()
+    posts = []
     for idx, submission in enumerate(submissions):
-        posts[idx+1] = {
+        posts.append({'id': idx,
             'title': submission.title,
-            'url': submission.url}
+            'url': submission.url})
     return posts
 
 if __name__ == '__main__':
