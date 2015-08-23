@@ -75,19 +75,34 @@ $(function() {
     // when youtube video finishes
     function onYTPlayerStateChange(event) {
         if (event.data === 0) {
-            $(document).trigger('videoDone');
+            $(document).trigger({
+              type: 'videoDone',
+              next: 1
+            });
         }
     }
     // when youtube errors out
     function onYTPlayerError(event) {
-        $(document).trigger('videoDone');
+        $(document).trigger({
+          type: 'videoDone',
+          next: 1
+        });
     }
 
 
     // Embed video
-    function embedVideo() {
+    function embedVideo(e) {
+        if (e.next_video) {
+          /* future proofing:
+           * if user can specify the exact video they want from a list, an event
+           * is created that sets the next_video event attribute explicitly
+           */
+          count = e.next_video;
+        } else {
+          counter = e.next ? e.next : 1;
+          count += counter;
+        }
         var url = videos[count].url;
-        // $('[data-container]').html('');
         $('[data-container]').hide();
         vidRank.text('Rank: '+count);
         vidTitle.text('Title: '+videos[count].title);
@@ -105,11 +120,10 @@ $(function() {
             // couldn't match video
             // try next video
             console.log('Failed to match video');
-            count++
-            embedVideo();
+            count += counter;
+            embedVideo(e);
             return false;
         }
-        count++;
     }
 
     // Event listener for video being done
@@ -148,12 +162,29 @@ $(function() {
     $.when(getYtLib(), getVimeoLib(), getVideos())
     .done(function() {
         $('[data-loading]').addClass('hidden');
-        embedVideo();
+        embedVideo({});
     });
 
     // Hud toggle
     $('[data-hud-toggle]').on('click', function() {
         $(this).parent().toggleClass('active');
     });
+
+
+    $('.next').on('click', handleClickedNext);
+    function handleClickedNext() {
+        $(document).trigger({
+          type: 'videoDone',
+          next: 1 
+        });
+    }
+
+    $('.previous').on('click', handleClickedPrevious);
+    function handleClickedPrevious() {
+        $(document).trigger({
+          type: 'videoDone',
+          next: -1 
+        });
+    }
 
 });
