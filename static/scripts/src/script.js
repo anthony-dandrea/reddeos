@@ -153,7 +153,18 @@ $(function() {
 
     // Hud toggle
     $('[data-hud-toggle]').on('click', function() {
-        $(this).parent().toggleClass('active');
+        $(this).toggleClass('active');
     });
+
+    // // Next button
+    // $('[data-next]').on('click', function() {
+    //     embedVideo();
+    // });
+
+    // // Previous button
+    // $('[data-previous]').on('click', function() {
+    //     count--;
+    //     embedVideo();
+    // });
 
 });
