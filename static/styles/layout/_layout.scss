@@ -44,6 +44,14 @@ body {
 
 }
 
+.controls {
+    i {
+        display: inline-block;
+        margin: 0.5em;
+        cursor: pointer;
+    }
+}
+
 .pull-down {
     color: darken($white, 30%);
     @include transition(all 0.2s);
