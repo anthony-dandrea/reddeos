@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 	<div ng-app="reddeo">
-		<div ng-controller="FooController as f">{{ f.foo|angular }}</div>
+		<div ng-controller="FooController">{[{ foo }]}</div>
     <div class="video-container" data-container id="youtube-video-container"></div>
     <div class="video-container" data-container id="vimeo-video-container"></div>
     <div class="loading" data-loading>
