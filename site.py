@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, make_response, session, redir
 from flask.ext.assets import Environment, Bundle
 from htmlmin.minify import html_minify
 from flask.ext.cache import Cache
+from flask.ext.triangle import Triangle
 
 ###################
 ## Configuration
@@ -13,6 +14,7 @@ assets = Environment(app)
 app.config.from_pyfile('config.py')
 Environment.auto_build = False
 cache = Cache(app,config={'CACHE_TYPE': 'simple'})
+Triangle(app)
 
 ###################
 ## Routes

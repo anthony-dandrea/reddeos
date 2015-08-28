@@ -21,6 +21,7 @@
     {% endblock content %}
     {% block scripts %}
         <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.js"></script>
 
         {# compiles all vender scripts to vendor.min.js #}
         {% assets filters='jsmin', output='scripts/dist/vendor.min.js', 'scripts/vendor/*.js' %}
