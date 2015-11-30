@@ -4,7 +4,7 @@
   "description": "Reddeos",
   "main": "main.js",
   "scripts": {
-    "start": "NODE_ENV=development webpack --watch --colors",
+    "start": "NODE_ENV=development webpack-dev-server",
     "build": "NODE_ENV=production webpack --colors",
     "test": "mocha --compilers js:babel/register",
     "lint": "eslint ."
@@ -39,6 +39,7 @@
     "react-addons-update": "^0.14.0",
     "react-cookie": "^0.4.2",
     "react-dom": "^0.14.0",
+    "react-hot-loader": "^1.3.0",
     "react-motion": "^0.3.1",
     "react-redux": "^2.1.2",
     "react-router": "^1.0.0-rc3",
@@ -54,6 +55,7 @@
     "style-loader": "^0.12.4",
     "superagent": "^1.4.0",
     "uglify-loader": "^1.2.0",
-    "webpack": "^1.12.2"
+    "webpack": "^1.12.2",
+    "webpack-dev-server": "^1.9.0"
   }
 }

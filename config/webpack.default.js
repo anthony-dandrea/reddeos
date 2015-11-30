@@ -8,8 +8,15 @@ export default {
     './src/main'
   ],
   output: {
-    path: '../static/reactDist',
-    filename: 'main.bundle.js'
+    path: './static',
+    filename: 'main.bundle.js',
+    publicPath: '/static/'
+  },
+  devServer: {
+    contentBase: './',
+    noInfo: true,
+    inline: true,
+    hot: true
   },
   resolve: {
     root: [
